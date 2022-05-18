@@ -17,7 +17,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 
 public class Main {
 
-	private static final String PROPERTIES_NAME = "app.properties";
+	private static final String PROPERTIES_NAME = "application.properties";
 	private static final String TOKEN = "TELEGRAM_TOKEN";
 
 	public static void main(String[] args) throws ConfigurationException {
