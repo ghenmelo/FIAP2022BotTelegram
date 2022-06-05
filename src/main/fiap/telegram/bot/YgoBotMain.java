@@ -2,94 +2,83 @@ package main.fiap.telegram.bot;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.request.ChatAction;
 import com.pengrad.telegrambot.request.GetUpdates;
-import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.BaseResponse;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 
-import main.fiap.telegram.bot.processor.ProcessingMessage;
+import main.fiap.telegram.bot.command.PlayCommand;
+import main.fiap.telegram.bot.command.SearchCommand;
+import main.fiap.telegram.bot.processor.Processor;
 import main.ygo.api.YgoProDeckApi;
+import main.ygo.tcg.Card;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class YgoBotMain {
 
     private static final String PROPERTIES_NAME = "application.properties";
     private static final String TOKEN = "TELEGRAM_TOKEN";
+    private static int messageOffset = 0;
 
     public static void main(String[] args) throws ConfigurationException, InterruptedException, IOException {
         PropertiesConfiguration config = new PropertiesConfiguration();
         config.load(PROPERTIES_NAME);
 
         String token = config.getString(TOKEN);
+        TelegramBot bot = new TelegramBot(token);
+        Processor processor = new Processor();
 
-        TelegramBot bot = new TelegramBot(config.getString(TOKEN));
+        GetUpdatesResponse updatesResponse = null;
+        SendResponse sendResponse = null;
 
-        // Objeto responsavel por receber as mensagens.
-        GetUpdatesResponse updatesResponse;
+        YgoProDeckApi.getAll();
+        Random random = new Random();
 
-        // Objeto responsavel por gerenciar o envio de respostas.
-        SendResponse sendResponse;
-
-        // Objeto responsavel por gerenciar o envio de acoes do chat.
-        BaseResponse baseResponse;
-
-        // Controle de off-set, isto e, a partir deste ID sera lido as mensagens
-        // pendentes na fila.
-        int messageOffset = 0;
-
-        // Loop infinito pode ser alterado por algum timer de intervalo curto.
         while (true) {
-            // Executa comando no Telegram para obter as mensagens pendentes a partir de um
-            // off-set (limite inicial).
             updatesResponse = bot.execute(new GetUpdates().limit(100).offset(messageOffset));
 
-            List<Update> updates = updatesResponse.updates(); // Lista de mensagens.
+            List<Update> updates = updatesResponse.updates();
 
             if (!updatesResponse.isOk()) {
                 System.out.println("Error code: " + updatesResponse.errorCode());
                 System.out.println("Error description: " + updatesResponse.description());
             } else {
-                // Analise de cada acao da mensagem.
                 for (Update update : updates) {
-
-                    messageOffset = update.updateId() + 1; // Atualizacao do off-set.
-
-                    String message = "";
+                    messageOffset = update.updateId() + 1;
                     try {
-                    	
-                    	System.out.println("Recebendo mensagem: " + update.message().text());
-                    	message = update.message().text();
-                    }catch (NullPointerException e) {
-                    	message = "";
-					}
-                    
-                	String responseMessage = ProcessingMessage.processing(message);
+                        String message = "";
+                        ArrayList<String> responses = new ArrayList<>();
+                        Long chatId = update.message().chat().id();
+                        Long userId = update.message().from().id();
+                        String userName = update.message().from().username();
 
-                    
-//                    String responseMessage = YgoProDeckApi.search(update.message().text(), "fname");
+                        message = update.message().text();
+                        System.out.println("Receiving message: " + update.message().text());
 
-                    System.out.println(responseMessage);
+                        Processor.Execution execution = processor.process(message);
 
-                    if (!responseMessage.isEmpty() && update.message() != null) {
-                        // Envio de "Escrevendo" antes de enviar a resposta.
+                        if (execution.command instanceof SearchCommand command) {
+                            ArrayList<Card> cards = YgoProDeckApi.search(command.getSearchParam(), execution.args);
+                            responses.add(cards.get(random.nextInt(0, cards.size())).toString());
+                        } else if (execution.command instanceof PlayCommand command) {
+                            command.play(chatId, userId, userName, YgoProDeckApi.cards);
+                        }
 
-                        baseResponse = bot.execute(new SendChatAction(update.message().chat().id(), ChatAction.typing.name()));
-      
-                        // Verificacao de acao de chat foi enviada com sucesso.
-                        System.out.println("Resposta de Chat Action Enviada? " + baseResponse.isOk());
+                        for (String response : responses)
+                            sendResponse = bot.execute(new SendMessage(chatId, response));
+                        if (!sendResponse.isOk()) {
+                            System.out.println("Error sending message: " + sendResponse.toString());
+                        }
 
-                        // Envio da mensagem de resposta.
-                        sendResponse = bot.execute(new SendMessage(update.message().chat().id(), responseMessage));
 
-                        // Verificacao de mensagem enviada com sucesso.
-                        System.out.println("Mensagem Enviada? " + sendResponse.isOk());
+                    } catch (Exception e) {
+                        System.out.println("Get message exception " + e.getMessage());
                     }
                 }
             }
