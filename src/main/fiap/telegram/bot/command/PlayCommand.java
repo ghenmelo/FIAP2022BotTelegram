@@ -1,5 +1,6 @@
 package main.fiap.telegram.bot.command;
 
+import main.fiap.telegram.bot.models.Player;
 import main.ygo.tcg.Card;
 
 import java.util.ArrayList;
@@ -9,26 +10,27 @@ import java.util.Random;
 
 public class PlayCommand extends Command {
 
-    private class Player {
-        public String name;
-        public Long id;
-        public Card card;
-
-        public Player(String name, Long id, Card card) {
-            this.name = name;
-            this.id = id;
-            this.card = card;
-        }
-    }
-
     public static final PlayCommand PLAY = new PlayCommand("/play");
     private HashMap<Long, ArrayList<Player>> games;
 
+    /**
+     * Construtor que chama o início do duelo
+     *
+     * @param command commando em questão
+     */
     public PlayCommand(String command) {
         super(command);
         this.games = new HashMap<>();
     }
 
+    /**
+     * Método que cria a mensagem do duelo, apresentando a carta de cada jogador.
+     *
+     * @param redraw flat pra se precisar jogar de novo a carta
+     * @param playerName nome do jogador
+     * @param card carta em questão
+     * @return retorna a mensagem do duelo
+     */
     private String buildDrawMessage(boolean redraw, String playerName, Card card) {
         StringBuilder sb = new StringBuilder();
         if (redraw)
@@ -41,6 +43,13 @@ public class PlayCommand extends Command {
         return sb.toString();
     }
 
+    /**
+     * Método que cria o corpo do duelo que será enviado por chat
+     *
+     * @param one player 1
+     * @param two player 2
+     * @return retonna o texto do duelo
+     */
     private String buildBattleMessage(Player one, Player two) {
         StringBuilder sb = new StringBuilder();
         sb.append("*" + one.card.name + "* battles *" + two.card.name + "*");
@@ -62,7 +71,17 @@ public class PlayCommand extends Command {
         return sb.toString();
     }
 
-
+    /**
+     * Método que executa o comando de play, onde é feito um duelo fictício com
+     * a máquina através de uma carta aleatória para cada. Ganha a carta normal
+     * com maior poder.
+     *
+     * @param chat chat
+     * @param playerId id do player
+     * @param playerName nome do player
+     * @param cardPool possíveis cartas
+     * @return retorna o resultado do combate
+     */
     public ArrayList<String> play(Long chat, Long playerId, String playerName, List<Card> cardPool) {
         ArrayList<String> results = new ArrayList<>();
         ArrayList<Player> players = games.get(chat);

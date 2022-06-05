@@ -19,6 +19,14 @@ public class YgoProDeckApi {
 
     public static final ArrayList<Card> cards = new ArrayList<>();
 
+    /**
+     * Método responsável por criar o objeto CARD, validando e atribuindo
+     * os dados com valores válidos.
+     *
+     * @param cardObject JSONObject da carta da requisicao
+     * @return retorna uma carta
+     * @throws IOException
+     */
     protected static Card getCard(JSONObject cardObject) throws JSONException {
         String imageUrl = cardObject.getJSONArray("card_images")
                 .getJSONObject(0)
@@ -83,6 +91,13 @@ public class YgoProDeckApi {
         return card;
     }
 
+    /**
+     * Método responsável por validar e ler o body recebido da API do YuGiOh.
+     *
+     * @param bodyString Body da requisição
+     * @return retorna uma lista de cartas
+     * @throws IOException
+     */
     protected static ArrayList<Card> getCards(String bodyString) {
         ArrayList<Card> cards = new ArrayList<>();
         JSONObject jsonObject = null;
@@ -109,6 +124,12 @@ public class YgoProDeckApi {
         return cards;
     }
 
+    /**
+     * Método responsável por buscar TODAS as cartas da API do YuGiOh.
+     *
+     * @return retorna uma lista de cartas
+     * @throws IOException
+     */
     public static ArrayList<Card> getAll() throws IOException {
         OkHttpClient client = new OkHttpClient();
         HttpUrl.Builder httpBuilder = HttpUrl.parse(BASE_URL + CARD_INFO_URL).newBuilder();
@@ -126,6 +147,14 @@ public class YgoProDeckApi {
         return YgoProDeckApi.cards;
     }
 
+    /**
+     * Método responsável por buscar as cartas pelo filtro do comando na API do YuGiOh.
+     *
+     * @param key chave do comando
+     * @param value valor do comando
+     * @return retorna uma lista de cartas
+     * @throws IOException
+     */
     public static ArrayList<Card> search(String key, String value) throws IOException {
         if (key.isEmpty() || value.isEmpty()) {
             return cards;

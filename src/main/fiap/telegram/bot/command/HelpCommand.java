@@ -1,6 +1,5 @@
 package main.fiap.telegram.bot.command;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class HelpCommand extends Command{
@@ -10,6 +9,11 @@ public class HelpCommand extends Command{
         super(command);
     }
 
+    /**
+     * Método que cria o retorno do comando de /help.
+     *
+     * @return Arrays com ajuda
+     */
     public ArrayList<String> help() {
         ArrayList<String> results = new ArrayList<>();
         StringBuilder sb = new StringBuilder();

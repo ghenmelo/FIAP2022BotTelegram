@@ -13,6 +13,12 @@ public class SearchCommand extends Command {
 
     private final String searchParam;
 
+    /**
+     * Método que busca se existe o comando que será executado.
+     *
+     * @param command comando em questão para ser executa
+     * @param param parametro de busca
+     */
     public SearchCommand(String command, String param) {
         super(command);
         this.searchParam = param;

@@ -8,19 +8,19 @@ import main.fiap.telegram.bot.command.Command;
 import main.fiap.telegram.bot.command.HelpCommand;
 import main.fiap.telegram.bot.command.PlayCommand;
 import main.fiap.telegram.bot.command.SearchCommand;
+import main.fiap.telegram.bot.models.Execution;
 
 public class Processor {
-    public class Execution {
-        public Command command;
-        public String args;
-
-        public Execution(Command command, String args) {
-            this.command = command;
-            this.args = args;
-        }
-    }
     private final ArrayList<Command> commands;
 
+    /**
+     * Método estático que é responsável por adicionar os comandos que serão utilizados, esse
+     * método é executa na criação da classe.
+     *
+     * @param commands lista de comandos
+     * @param c classe de onde será extraido os comandos
+     * @return Array com erros.
+     */
     private static ArrayList<String> addCommandsFromClass(ArrayList<Command> commands, Class c) {
         ArrayList<String> errors = new ArrayList<>();
         Field[] searchCommands;
@@ -51,6 +51,9 @@ public class Processor {
         return errors;
     }
 
+    /**
+     * Construtor da classe, iniciando os campos.
+     */
     public Processor() {
         this.commands = new ArrayList<>();
         ArrayList<String>  errors = new ArrayList<>();
@@ -62,6 +65,12 @@ public class Processor {
         }
     }
 
+    /**
+     * Metódo que inicia o processo de executar um comando
+     *
+     * @param message mensagem recebida
+     * @return retorna Execution com o comando e seus argumentos
+     */
     public Execution process(String message) {
         for(Command command : this.commands) {
             String args = command.check(message);

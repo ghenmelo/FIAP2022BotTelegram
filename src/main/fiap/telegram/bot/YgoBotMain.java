@@ -12,6 +12,7 @@ import com.pengrad.telegrambot.response.SendResponse;
 import main.fiap.telegram.bot.command.HelpCommand;
 import main.fiap.telegram.bot.command.PlayCommand;
 import main.fiap.telegram.bot.command.SearchCommand;
+import main.fiap.telegram.bot.models.Execution;
 import main.fiap.telegram.bot.processor.Processor;
 import main.ygo.api.YgoProDeckApi;
 import main.ygo.tcg.Card;
@@ -31,6 +32,10 @@ public class YgoBotMain {
     private static int messageOffset = 0;
     public static final String BOT_NAME = "@ygotcgbot";
 
+    /**
+     * Método principal do bot de Yugioh, onde é iniciado a leitura dos comandos recebidos pelo bot
+     * no telegram.
+     */
     public static void main(String[] args) throws ConfigurationException, InterruptedException, IOException {
         PropertiesConfiguration config = new PropertiesConfiguration();
         config.load(PROPERTIES_NAME);
@@ -69,7 +74,7 @@ public class YgoBotMain {
                         message = update.message().text();
                         System.out.println("Receiving message: " + update.message().text());
 
-                        Processor.Execution execution = processor.process(message);
+                        Execution execution = processor.process(message);
 
                         if(execution == null) {
                             responses.add("I dont know this command, check /help for commands");

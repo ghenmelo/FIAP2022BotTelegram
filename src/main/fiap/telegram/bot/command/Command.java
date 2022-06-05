@@ -10,6 +10,12 @@ public abstract class Command {
         this.command = command;
     }
 
+    /**
+     * Método que valida a mensagem recebida e pega os argumentos
+     *
+     * @param message mensagem recebida
+     * @return argumentos
+     */
     public String check(String message) {
         try {
             String[] splitMessages = message.split(" ", 2);
