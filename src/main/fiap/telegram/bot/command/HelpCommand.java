@@ -1,6 +1,9 @@
 package main.fiap.telegram.bot.command;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class HelpCommand extends Command{
     public static final HelpCommand HELP = new HelpCommand("/help");

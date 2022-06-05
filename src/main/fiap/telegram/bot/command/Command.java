@@ -1,6 +1,8 @@
 package main.fiap.telegram.bot.command;
 
 import main.fiap.telegram.bot.YgoBotMain;
+
+import java.util.List;
 import java.util.Locale;
 
 public abstract class Command {

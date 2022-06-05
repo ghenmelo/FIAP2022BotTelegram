@@ -14,11 +14,11 @@ public class Processor {
     private final ArrayList<Command> commands;
 
     /**
-     * MÈtodo est·tico que È respons·vel por adicionar os comandos que ser„o utilizados, esse
-     * mÈtodo È executa na criaÁ„o da classe.
+     * M√©todo est√°tico que √© respons√°vel por adicionar os comandos que ser√£o utilizados, esse
+     * m√©todo √© executado na cria√ß√£o da classe.
      *
      * @param commands lista de comandos
-     * @param c classe de onde ser· extraido os comandos
+     * @param c classe de onde ser√° extraido os comandos
      * @return Array com erros.
      */
     private static ArrayList<String> addCommandsFromClass(ArrayList<Command> commands, Class c) {
@@ -66,7 +66,7 @@ public class Processor {
     }
 
     /**
-     * MetÛdo que inicia o processo de executar um comando
+     * Met√≥do que inicia o processo de executar um comando
      *
      * @param message mensagem recebida
      * @return retorna Execution com o comando e seus argumentos
